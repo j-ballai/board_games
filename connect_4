@@ -1,0 +1,132 @@
+'''
+Created on May 1, 2019
+
+I pledge my honor that I have abided by the Stevens Honor System.
+
+@author: Joseph Ballai
+
+username: jballai
+'''
+
+class Board(object):
+    def __init__(self, width=7, height=6):
+        '''Constructor.'''
+        self.width = width
+        self.height = height
+        self.Board = []
+        for y in range(self.height):
+            self.Board.append([])
+            for x in range(self.width):
+                self.Board[y].append(' ')
+        print(self.Board)
+    
+    def __str__(self):
+        '''Returns the representation as a string.'''
+        string = ''
+        for i in self.Board:
+            string += '|' + '|'.join(i) + '|\n'
+        string += '-' + '-' * self.width * 2 + '\n'
+        string += ' ' + ' '.join(str(i) for i in range(self.width))
+        return string
+    
+    def allowsMove(self, col):
+        '''Returns True if the move is allowed and False otherwise.'''
+        if col > self.width or col < 0 or self.Board[0][col] != ' ':
+            return False
+        if col > self.height:
+            return False
+        return True
+    
+    def addMove(self, col, ox):
+        '''Adds an ox checker to the program.'''
+        if self.allowsMove(col):
+            for a in list(reversed(range(self.height))):
+                if self.Board[a][col] == ' ':
+                    self.Board[a][col] = ox
+                    break
+    
+    def setBoard(self, move_string):
+        '''This method helps you (and us!) to test your Connect-Four Board
+        class.'''
+        nextCh = 'X'
+        for col_string in move_string:
+            col = int(col_string)
+            if 0 <= col <= self.width:
+                self.addMove(col, nextCh)
+            if nextCh == 'X':
+                nextCh = 'O'
+            else:
+                nextCh == 'X'
+
+    def delMove(self, col):
+        '''Allows the move to be deleted if needed.'''
+        if self.allowsMove(col):
+            return
+        else:
+            self.Board[0][col] = ' '
+
+    def winsFor(self, ox):
+        """Returns True if the given checker, 'X' or
+        'O', has won the calling Board, otherwise it is False."""
+        result = 1
+        for row in list(reversed(range(self.height))):
+            for col in range(self.width):
+                if ox not in self.Board[row][col]:
+                    continue
+                if row > 2:
+                    for a in range(1,4):
+                        if self.Board[row-a][col] == ox:
+                            result = result + 1
+                        else:
+                            result = 1
+                            break
+                    if result == 4:
+                        return True
+                if col > 2:
+                    for a in range(1,4):
+                        if self.Board[row][col-a] == ox:
+                            result = result + 1
+                        else:
+                            result = 1
+                            break
+                        if result == 4:
+                            return True
+                if col > 2 and row > 2:
+                    for a in range(1,4):
+                        if self.Board[row-a][col-a] == ox:
+                            result = result + 1
+                        else:
+                            result = 1
+                            break
+                        if result == 4:
+                            return True
+                if row > 2 and col < self.width - 3:
+                    for a in range(1,4):
+                        if self.Board[row-a][col+a] == ox:
+                            result = result + 1
+                        else:
+                            result = 1
+                            break
+                        if result == 4:
+                            return True
+
+    def hostGame(self):
+        '''This is a method that, when called from a connect four board
+        object, will run a loop allowing the user(s) to play a game. '''
+        print('Welcome to Connect Four!')
+        print(self)
+        while True:
+            user = input('Xs choice: ')
+            self.addMove(int(user),'X')
+            print(self)
+            if self.winsFor('X'):
+                print('X wins-- Congratulations!')
+                break
+            user = input('Os choice: ')
+            self.addMove(int(user), 'O')
+            print(self)
+            if self.winsFor('O'):
+                print('O wins-- Congratulations!')
+                break
+b = Board(7,6)
+b.hostGame()
